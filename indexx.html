@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Plataforma Docentes CyL – Evaluación por criterios</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --color-principal: #2563eb;
+      --color-principal-oscuro: #1d4ed8;
+      --color-secundario: #0f172a;
+      --color-fondo: #f3f4f6;
+      --color-seccion: #f9fafb;
+      --color-borde: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: radial-gradient(circle at top left, #e0f2fe 0, #f3f4f6 45%, #e5e7eb 100%);
+      color: #111827;
+    }
+
+    .layout {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px 12px;
+    }
+
+    .contenedor {
+      width: 100%;
+      max-width: 1100px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow:
+        0 20px 25px -20px rgba(15, 23, 42, 0.25),
+        0 0 0 1px rgba(148, 163, 184, 0.2);
+      padding: 22px 22px 26px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .titulo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .titulo-pill {
+      width: 8px;
+      height: 32px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #2563eb, #22c55e);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--color-secundario);
+    }
+
+    .subtitulo {
+      margin: 3px 0 0;
+      font-size: 0.9rem;
+      color: #6b7280;
+      max-width: 560px;
+    }
+
+    .badge {
+      align-self: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #e5e7eb;
+      margin: 12px 0 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .panel {
+      background: var(--color-seccion);
+      border-radius: 12px;
+      border: 1px solid var(--color-borde);
+      padding: 12px 14px 14px;
+    }
+
+    .panel h2 {
+      font-size: 1rem;
+      margin: 0 0 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-secundario);
+    }
+
+    .panel h2::before {
+      content: "";
+      width: 3px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--color-principal);
+      display: inline-block;
+    }
+
+    .panel p {
+      margin: 3px 0 8px;
+      font-size: 0.88rem;
+      color: #6b7280;
+    }
+
+    .tag {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 1px 8px;
+      border-radius: 999px;
+      background: #e5f0ff;
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .lista-pasos {
+      font-size: 0.86rem;
+      padding-left: 1.2rem;
+      margin: 4px 0 0;
+      color: #4b5563;
+    }
+
+    .lista-pasos li {
+      margin-bottom: 3px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 12px 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .card-titulo {
+      font-size: 0.96rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .card-curso {
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .chip {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      color: #4b5563;
+      white-space: nowrap;
+    }
+
+    .chip-ok {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+      color: #166534;
+    }
+
+    .chip-soon {
+      border-color: #fee2e2;
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 0.8rem;
+      color: #6b7280;
+    }
+
+    .card-footer {
+      margin-top: 6px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      color: #111827;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: #e5e7eb;
+    }
+
+    .btn-primario {
+      border: none;
+      background: var(--color-principal);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .btn-primario:hover {
+      background: var(--color-principal-oscuro);
+    }
+
+    .btn span.icono {
+      font-size: 0.9rem;
+    }
+
+    .seccion-nota {
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: #6b7280;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .seccion-nota strong {
+      color: #374151;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <main class="contenedor">
+      <header>
+        <div class="titulo">
+          <div class="titulo-pill"></div>
+          <div>
+            <h1>Plataforma Docentes CyL</h1>
+            <p class="subtitulo">
+              Herramientas para diseñar evaluación continua por criterios según la LOMLOE
+              en Castilla y León, empezando por 1.º ESO de Biología y Geología.
+            </p>
+          </div>
+        </div>
+        <div class="badge">
+          Versión piloto · Uso personal
+        </div>
+      </header>
+
+      <hr />
+
+      <div class="grid">
+        <!-- Panel izquierdo: Cómo usar la plataforma -->
+        <section class="panel">
+          <h2>Cómo usar esta plataforma<span class="tag">Paso a paso</span></h2>
+          <p>
+            La idea es sencilla: eliges materia y curso, abres la herramienta correspondiente
+            y generas tu Excel de evaluación continua por criterios.
+          </p>
+          <ol class="lista-pasos">
+            <li>Elige una materia y curso del panel derecho.</li>
+            <li>Abre el generador correspondiente (por ahora, 1.º ESO Biología y Geología).</li>
+            <li>Marca los criterios, define instrumentos y actividades.</li>
+            <li>Descarga el Excel y úsalo durante todo el curso.</li>
+          </ol>
+          <p style="margin-top:6px;">
+            A medida que se vayan creando más herramientas, se irán activando
+            los cursos y materias en el panel derecho.
+          </p>
+        </section>
+
+        <!-- Panel derecho: Materias y cursos -->
+        <section class="panel">
+          <h2>Herramientas disponibles y en desarrollo<span class="tag">Mapa general</span></h2>
+          <p>
+            Empezamos con <strong>1.º ESO – Biología y Geología</strong>. El resto de materias
+            y cursos se irán activando poco a poco siguiendo la misma lógica de trabajo por criterios.
+          </p>
+
+          <div class="cards-grid">
+            <!-- Card 1: 1º ESO Biología y Geología -->
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-titulo">Biología y Geología</div>
+                  <div class="card-curso">1.º ESO · Evaluación continua por criterios</div>
+                </div>
+                <span class="chip chip-ok">Disponible</span>
+              </div>
+              <p>
+                Generador completo de Excel: criterios LOMLOE por curso, instrumentos,
+                actividades, nota por CE y nota global acumulativa.
+              </p>
+              <div class="card-footer">
+                <!-- ⚠️ IMPORTANTE: CAMBIA "generador.html" POR EL NOMBRE REAL DE TU ARCHIVO -->
+                <a class="btn btn-primario" href="evaluacion_criterios_biogeo_1eso.html">
+                  <span class="icono">↗</span>
+                  Abrir generador Biología 1.º ESO
+                </a>
+              </div>
+            </article>
+
+            <!-- Card 2: Otros cursos de Biología y Geología -->
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-titulo">Biología y Geología / Biología / Geología</div>
+                  <div class="card-curso">3.º–4.º ESO · 1.º–2.º Bachillerato</div>
+                </div>
+                <span class="chip chip-soon">En construcción</span>
+              </div>
+              <p>
+                Adaptación del mismo modelo de evaluación por criterios a los cursos superiores,
+                con los CE específicos de cada nivel en CyL.
+              </p>
+              <div class="card-footer">
+                <button class="btn" type="button" disabled>
+                  <span class="icono">⏳</span>
+                  Próximamente
+                </button>
+              </div>
+            </article>
+
+            <!-- Card 3: Otras materias -->
+            <article class="card">
+              <div class="card-header">
+                <div>
+                  <div class="card-titulo">Historia · FyQ · Inglés · Filosofía…</div>
+                  <div class="card-curso">ESO y Bachillerato · CyL</div>
+                </div>
+                <span class="chip chip-soon">En construcción</span>
+              </div>
+              <p>
+                Mismo enfoque: criterios de evaluación por materia y curso, instrumentos personalizados
+                y generación automática de Excel de seguimiento.
+              </p>
+              <div class="card-footer">
+                <button class="btn" type="button" disabled>
+                  <span class="icono">🛠</span>
+                  Diseñando estructura común
+                </button>
+              </div>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <div class="seccion-nota">
+        <span>
+          <strong>Nota:</strong> esta plataforma está pensada para ir creciendo. De momento, el único módulo funcional
+          es 1.º ESO Biología y Geología.
+        </span>
+        <span>
+          Cuando se añadan nuevas materias, se mantendrá la misma lógica de trabajo: CE oficiales de CyL,
+          instrumentos, actividades y Excel automático.
+        </span>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
