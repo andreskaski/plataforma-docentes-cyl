@@ -4,22 +4,97 @@
   "etapa": "ESO",
   "comunidad": "CyL",
   "listaCE": [
-    "CE 1.1", "CE 1.2", "CE 1.3",
-    "CE 2.1", "CE 2.2", "CE 2.3", "CE 2.4",
-    "CE 3.1", "CE 3.2", "CE 3.3", "CE 3.4", "CE 3.5", "CE 3.6", "CE 3.7",
+    "CE 1.1",
+    "CE 1.2",
+    "CE 1.3",
+    "CE 2.1",
+    "CE 2.2",
+    "CE 2.3",
+    "CE 2.4",
+    "CE 3.1",
+    "CE 3.2",
+    "CE 3.3",
+    "CE 3.4",
+    "CE 3.5",
+    "CE 3.6",
+    "CE 3.7",
     "CE 4.1",
     "CE 5.1",
-    "CE 6.1", "CE 6.2"
+    "CE 6.1",
+    "CE 6.2"
   ],
   "detalleCE": {
     "CE 1.1": {
       "competencia": "1",
-      "descripcion": "Analizar conceptos y procesos relacionados con los contenidos de Biología y Geología interpretando y organizando la información en diferentes formatos."
+      "descripcion": "Analizar conceptos y procesos relacionados con los contenidos de Biología y Geología interpretando y organizando la información en diferentes formatos (textos, modelos, gráficos, tablas, esquemas, símbolos, páginas web, entre otros)."
     },
     "CE 1.2": {
       "competencia": "1",
-      "descripcion": "Facilitar la comprensión de información relacionada con Biología y Geología transmitiéndola de forma clara..."
+      "descripcion": "Facilitar la comprensión de información relacionada con los contenidos de la materia Biología y Geología transmitiéndola de forma clara utilizando la terminología y el formato adecuados tales como textos, modelos, gráficos, tablas, vídeos, esquemas, símbolos o contenidos digitales."
+    },
+    "CE 1.3": {
+      "competencia": "1",
+      "descripcion": "Analizar y explicar fenómenos biológicos y geológicos representándolos mediante modelos y diagramas y utilizando, cuando sea necesario, los pasos del método científico, usando adecuadamente el vocabulario en un contexto preciso y adecuado a su nivel, en diferentes formatos destacando el uso de los contenidos digitales."
+    },
+    "CE 2.1": {
+      "competencia": "2",
+      "descripcion": "Resolver cuestiones relacionadas con los contenidos de la materia Biología y Geología seleccionando y organizando la información mediante el uso correcto de distintas fuentes de veracidad científica."
+    },
+    "CE 2.2": {
+      "competencia": "2",
+      "descripcion": "Reconocer la información con base científica distinguiéndola de pseudociencias, fake news y bulos manteniendo una actitud crítica ante estos, intentando desarrollar soluciones creativas sostenibles para resolver problemas concretos del entorno."
+    },
+    "CE 2.3": {
+      "competencia": "2",
+      "descripcion": "Valorar la contribución de la ciencia a la sociedad y la labor de las personas dedicadas a ella con independencia de su etnia, sexo o cultura, destacando y reconociendo el papel de las mujeres científicas y entendiendo la investigación como una labor colectiva e interdisciplinar en constante evolución."
+    },
+    "CE 2.4": {
+      "competencia": "2",
+      "descripcion": "Utilizar de forma correcta recursos científicos como manuales, guías de campo, claves dicotómicas y fuentes digitales de información, veracidad y teniendo en cuenta que la información que ofrecen sea contrastada y validada científicamente."
+    },
+    "CE 3.1": {
+      "competencia": "3",
+      "descripcion": "Plantear preguntas e hipótesis que puedan ser respondidas o contrastadas utilizando la metodología científica mediante textos escritos o búsquedas en Internet sobre fenómenos biológicos y/o geológicos."
+    },
+    "CE 3.2": {
+      "competencia": "3",
+      "descripcion": "Diseñar la experimentación de fenómenos biológicos y geológicos a corto plazo de modo que permitan responder a preguntas concretas y contrastar hipótesis planteadas."
+    },
+    "CE 3.3": {
+      "competencia": "3",
+      "descripcion": "Realizar toma de datos cuantitativos o cualitativos en experimentos ya planteados sobre fenómenos biológicos y geológicos utilizando los instrumentos, herramientas, métodos y técnicas adecuadas, incluidas las digitales."
+    },
+    "CE 3.4": {
+      "competencia": "3",
+      "descripcion": "Interpretar los resultados obtenidos en el proyecto de investigación utilizando herramientas matemáticas y tecnológicas sencillas."
+    },
+    "CE 3.5": {
+      "competencia": "3",
+      "descripcion": "Cooperar dentro de un proyecto científico grupal desempeñando una función concreta, demostrando respeto hacia la diversidad, la igualdad de género, equidad y empatía, y favoreciendo la inclusión."
+    },
+    "CE 3.6": {
+      "competencia": "3",
+      "descripcion": "Presentar la información y observación de campo utilizando el formato de textos, tablas, pequeños informes y herramientas digitales."
+    },
+    "CE 3.7": {
+      "competencia": "3",
+      "descripcion": "Conocer las normas de seguridad necesarias valorando su aplicación a la hora de realizar un trabajo científico de campo o de laboratorio."
+    },
+    "CE 4.1": {
+      "competencia": "4",
+      "descripcion": "Dar explicación a procesos biológicos o geológicos utilizando conocimientos, datos e información aportados por el profesorado, el razonamiento lógico, el pensamiento computacional o recursos digitales, gestionando y utilizando, en este último caso, un entorno personal digital de aprendizaje."
+    },
+    "CE 5.1": {
+      "competencia": "5",
+      "descripcion": "Relacionar, con fundamentos científicos de las ciencias biológicas y de la Tierra, la preservación de la biodiversidad, la conservación del medio ambiente, la protección de los seres vivos del entorno, el desarrollo sostenible y la calidad de vida."
+    },
+    "CE 6.1": {
+      "competencia": "6",
+      "descripcion": "Valorar la importancia de los ecosistemas y el paisaje como patrimonio natural analizando la fragilidad de los elementos que lo componen y reconociendo el entorno como parte esencial para el mantenimiento de la vida, así como elemento cultural, desarrollando una actitud sostenible que promueva su conservación."
+    },
+    "CE 6.2": {
+      "competencia": "6",
+      "descripcion": "Reflexionar sobre los riesgos naturales e impactos ambientales que determinados sucesos naturales y acciones humanas puedan suponer sobre el medio ambiente, determinando las repercusiones que ocasionan."
     }
-    // ... y así con todos, igual que en tu CE_DETALLE actual
   }
 }
