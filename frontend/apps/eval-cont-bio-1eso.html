@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador Excel – Evaluación continua por criterios</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --color-principal: #2563eb;
+      --color-principal-oscuro: #1d4ed8;
+      --color-secundario: #0f172a;
+      --color-fondo: #f3f4f6;
+      --color-seccion: #f9fafb;
+      --color-borde: #e5e7eb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: radial-gradient(circle at top left, #e0f2fe 0, #f3f4f6 45%, #e5e7eb 100%);
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      background: #ffffff;
+      border-radius: 14px;
+      box-shadow:
+        0 20px 25px -20px rgba(15, 23, 42, 0.25),
+        0 0 0 1px rgba(148, 163, 184, 0.25);
+      padding: 18px 22px 26px;
+      max-width: 1180px;
+      width: 100%;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--color-secundario);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1::before {
+      content: "";
+      width: 6px;
+      height: 26px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--color-principal), #22c55e);
+      display: inline-block;
+    }
+
+    .subtitulo {
+      margin: 0 0 14px;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+
+    h2 {
+      font-size: 1.05rem;
+      margin: 0 0 6px;
+      color: var(--color-secundario);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    h2::before {
+      content: "";
+      width: 3px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--color-principal);
+      display: inline-block;
+    }
+
+    .seccion {
+      border-radius: 10px;
+      border: 1px solid var(--color-borde);
+      padding: 10px 12px 12px;
+      margin-bottom: 16px;
+      background: var(--color-seccion);
+    }
+
+    .seccion-intro {
+      border-left: 4px solid var(--color-principal);
+      background: #eff6ff;
+    }
+
+    .ayuda {
+      font-size: 0.84rem;
+      color: #6b7280;
+      line-height: 1.45;
+      margin-top: 2px;
+    }
+
+    ol.ayuda {
+      padding-left: 1.1rem;
+    }
+
+    ol.ayuda li {
+      margin-bottom: 3px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 8px;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 5px 6px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #eff3ff;
+      color: #374151;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    tbody tr:hover {
+      background: #e5f0ff;
+    }
+
+    label {
+      display: inline-block;
+      margin: 2px 0;
+      font-size: 0.9rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      padding: 4px 6px;
+      margin: 2px 0;
+      font-size: 0.85rem;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+      background-color: #ffffff;
+    }
+
+    input[type="number"] {
+      width: 90px;
+    }
+
+    input[type="text"] {
+      width: 220px;
+      max-width: 100%;
+    }
+
+    select {
+      min-width: 160px;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--color-principal);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+      background-color: #f9fafb;
+    }
+
+    .btn {
+      padding: 6px 10px;
+      margin: 6px 4px 0 0;
+      cursor: pointer;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn::before {
+      content: "•";
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .btn-primario {
+      background: #2563eb;
+      color: white;
+      border: none;
+      font-weight: 600;
+      padding: 7px 14px;
+    }
+
+    .btn-primario::before {
+      content: "↓";
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.8rem;
+    }
+
+    .btn-primario:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-secundario:hover {
+      background: #e5e7eb;
+    }
+
+    .btn-mini {
+      padding: 3px 7px;
+      font-size: 0.78rem;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      background: #f9fafb;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .btn-mini:hover {
+      background: #e5e7eb;
+    }
+
+    .botonera {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+      margin-bottom: 2px;
+    }
+
+    .tabla-pequeña th,
+    .tabla-pequeña td {
+      font-size: 0.85rem;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 999px;
+      background: #e5f0ff;
+      color: #1d4ed8;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+
+    .mat-total-fila {
+      font-weight: 600;
+      color: #111827;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .mat-total-ok {
+      color: #16a34a;
+    }
+
+    .mat-total-warn {
+      color: #b45309;
+    }
+
+    .td-act-ce {
+      min-width: 260px;
+    }
+
+    .act-ce-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .act-ce-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .act-ce-select {
+      min-width: 140px;
+    }
+
+    .act-ce-peso {
+      width: 80px;
+    }
+
+    .botonera-final {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .filtro-competencia {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin: 6px 0 4px;
+    }
+
+    .filtro-competencia label {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #374151;
+    }
+
+    .ce-codigo {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .ce-descripcion {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 2px;
+      line-height: 1.3;
+    }
+
+    @media (max-width: 900px) {
+      .app-container {
+        padding: 14px;
+        border-radius: 10px;
+      }
+      h1 {
+        font-size: 1.3rem;
+      }
+      table {
+        font-size: 0.8rem;
+      }
+      input[type="text"] {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <h1>Generador Excel – Evaluación continua por criterios</h1>
+    <p class="subtitulo">
+      Diseña una evaluación por criterios clara, continua y fácil de mantener. El Excel resultante te permitirá
+      añadir o quitar actividades libremente durante el curso.
+    </p>
+
+    <div class="seccion seccion-intro">
+      <h2>Instrucciones rápidas<span class="tag">Paso a paso</span></h2>
+      <ol class="ayuda">
+        <li><strong>Marca los criterios</strong> que vas a usar y pon su peso total en el curso (sección 1).</li>
+        <li><strong>Define los instrumentos</strong> de evaluación (cuaderno, pruebas, proyectos…) (sección 2).</li>
+        <li>Pulsa <strong>“Generar tabla CE–instrumentos”</strong> y reparte el % de cada criterio entre los instrumentos (sección 3).</li>
+        <li><strong>Añade las actividades</strong> (exámenes, trabajos…) indicando instrumento, peso dentro del instrumento y, si quieres, qué CE trabaja cada actividad (sección 4).</li>
+        <li>Elige <strong>Excel simplificado</strong> (lo mínimo imprescindible) o <strong>Excel avanzado</strong> (más pestañas de apoyo) y descárgalo.</li>
+      </ol>
+    </div>
+
+    <!-- SECCIÓN 1: Criterios de evaluación -->
+    <div class="seccion">
+      <h2>1. Criterios de evaluación del curso<span class="tag">Qué y cuánto</span></h2>
+      <p class="ayuda">
+        Marca los criterios que vas a trabajar a lo largo del curso y el peso total que tendrán en la nota final.
+        La suma ideal de los pesos debería ser 100%.
+      </p>
+
+      <div class="filtro-competencia">
+        <label>
+          Ver criterios de:
+          <select id="filtroCompetencia">
+            <option value="todas">Todas las competencias específicas</option>
+            <option value="1">Competencia específica 1</option>
+            <option value="2">Competencia específica 2</option>
+            <option value="3">Competencia específica 3</option>
+            <option value="4">Competencia específica 4</option>
+            <option value="5">Competencia específica 5</option>
+            <option value="6">Competencia específica 6</option>
+          </select>
+        </label>
+        <span class="ayuda" style="margin:0;">
+          Usa el filtro para ir marcando CE por competencia. Las casillas marcadas y los pesos se conservan aunque cambies de vista.
+        </span>
+      </div>
+
+      <table id="tablaCE" class="tabla-pequeña">
+        <thead>
+          <tr>
+            <th>Usar</th>
+            <th>Criterio de Evaluación (CE)</th>
+            <th>Peso % en el curso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filas generadas por JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECCIÓN 2: Instrumentos de evaluación -->
+    <div class="seccion">
+      <h2>2. Instrumentos de evaluación<span class="tag">Cómo evalúas</span></h2>
+      <p class="ayuda">
+        Define los instrumentos que vas a usar (puedes cambiar los nombres). Solo se tendrán en cuenta los que
+        tengan nombre. Más tarde, en el Excel, lo normal es no tocar los instrumentos (solo las actividades).
+      </p>
+      <table id="tablaInstrumentos" class="tabla-pequeña">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Nombre del instrumento</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Filas generadas por JS -->
+        </tbody>
+      </table>
+      <div class="botonera">
+        <button type="button" class="btn btn-secundario" id="btnAddInstrumento">Añadir instrumento</button>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 3: Reparto CE – instrumentos -->
+    <div class="seccion">
+      <h2>3. Reparto de cada criterio entre instrumentos<span class="tag">Reparto interno</span></h2>
+      <p class="ayuda">
+        Pulsa el botón para generar la tabla. Después, para cada criterio, reparte el 100% entre los instrumentos que
+        realmente usen ese criterio. Si una celda queda a 0, ese instrumento no aporta a ese criterio.<br>
+        El total de la fila se actualiza automáticamente. Más tarde podrás retocar estos valores dentro del Excel.
+      </p>
+      <div class="botonera">
+        <button type="button" class="btn btn-secundario" id="btnGenerarMatrizCEInstr">
+          Generar / actualizar tabla CE–instrumentos
+        </button>
+      </div>
+      <table id="tablaMatrizCEInstr" class="tabla-pequeña">
+        <thead>
+          <tr></tr>
+        </thead>
+        <tbody>
+          <!-- Filas generadas por JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- SECCIÓN 4: Actividades -->
+    <div class="seccion">
+      <h2>4. Actividades del curso<span class="tag">Lo que hacen</span></h2>
+      <p class="ayuda">
+        Añade las actividades que vas a realizar a lo largo del curso. Cada actividad pertenece a un instrumento y
+        tiene un peso interno dentro de ese instrumento. <br>
+        <strong>Opcional:</strong> puedes indicar hasta varios criterios de evaluación por actividad y el % de la
+        nota de esa actividad que se asigna a cada CE. Si seleccionas varios CE y no pones % en ninguno, el
+        generador reparte el 100% a partes iguales entre ellos.<br>
+        Los CE disponibles en cada actividad se limitan automáticamente a los que ese instrumento trabaja en la
+        tabla de la sección 3.
+      </p>
+      <div class="botonera">
+        <button type="button" class="btn btn-secundario" id="btnAddActividad">Añadir actividad</button>
+        <button type="button" class="btn btn-secundario" id="btnDelActividad">Borrar última actividad</button>
+        <button type="button" class="btn btn-secundario" id="btnActualizarInstrActividades">
+          Actualizar lista de instrumentos en actividades
+        </button>
+      </div>
+      <table id="tablaActividades" class="tabla-pequeña">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Código act.</th>
+            <th>Nombre actividad</th>
+            <th>Instrumento</th>
+            <th>% dentro del instrumento</th>
+            <th>CE que trabaja la actividad (% dentro de la actividad)</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyActividades">
+          <!-- Filas generadas por JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="botonera-final">
+      <button class="btn btn-primario" id="btnExcelSimple" type="button">
+        Excel simplificado (básico)
+      </button>
+      <button class="btn btn-primario" id="btnExcelAvanzado" type="button">
+        Excel avanzado (con extras)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const XLSXUtils = XLSX.utils;
+      const MAX_ALUMNOS = 40;
+      const MAX_ACT = 30; // máximo de actividades que el Excel soporta
+
+      // ---- 0. CE DETALLADOS PARA CyL 1.º ESO BIOLOGÍA Y GEOLOGÍA ----
+      const listaCE = [
+        "CE 1.1", "CE 1.2", "CE 1.3",
+        "CE 2.1", "CE 2.2", "CE 2.3", "CE 2.4",
+        "CE 3.1", "CE 3.2", "CE 3.3", "CE 3.4", "CE 3.5", "CE 3.6", "CE 3.7",
+        "CE 4.1",
+        "CE 5.1",
+        "CE 6.1", "CE 6.2"
+      ];
+
+      const CE_DETALLE = {
+        "CE 1.1": {
+          competencia: "1",
+          descripcion: "Analizar conceptos y procesos relacionados con los contenidos de Biología y Geología interpretando y organizando la información en diferentes formatos (textos, modelos, gráficos, tablas, esquemas, símbolos, páginas web, entre otros)."
+        },
+        "CE 1.2": {
+          competencia: "1",
+          descripcion: "Facilitar la comprensión de información relacionada con los contenidos de la materia Biología y Geología transmitiéndola de forma clara utilizando la terminología y el formato adecuados tales como textos, modelos, gráficos, tablas, vídeos, esquemas, símbolos o contenidos digitales."
+        },
+        "CE 1.3": {
+          competencia: "1",
+          descripcion: "Analizar y explicar fenómenos biológicos y geológicos representándolos mediante modelos y diagramas y utilizando, cuando sea necesario, los pasos del método científico, usando adecuadamente el vocabulario en un contexto preciso y adecuado a su nivel, en diferentes formatos destacando el uso de los contenidos digitales."
+        },
+        "CE 2.1": {
+          competencia: "2",
+          descripcion: "Resolver cuestiones relacionadas con los contenidos de la materia Biología y Geología seleccionando y organizando la información mediante el uso correcto de distintas fuentes de veracidad científica."
+        },
+        "CE 2.2": {
+          competencia: "2",
+          descripcion: "Reconocer la información con base científica distinguiéndola de pseudociencias, fake news y bulos manteniendo una actitud crítica ante estos, intentando desarrollar soluciones creativas sostenibles para resolver problemas concretos del entorno."
+        },
+        "CE 2.3": {
+          competencia: "2",
+          descripcion: "Valorar la contribución de la ciencia a la sociedad y la labor de las personas dedicadas a ella con independencia de su etnia, sexo o cultura, destacando y reconociendo el papel de las mujeres científicas y entendiendo la investigación como una labor colectiva e interdisciplinar en constante evolución."
+        },
+        "CE 2.4": {
+          competencia: "2",
+          descripcion: "Utilizar de forma correcta recursos científicos como manuales, guías de campo, claves dicotómicas y fuentes digitales de información, veracidad y teniendo en cuenta que la información que ofrecen sea contrastada y validada científicamente."
+        },
+        "CE 3.1": {
+          competencia: "3",
+          descripcion: "Plantear preguntas e hipótesis que puedan ser respondidas o contrastadas utilizando la metodología científica mediante textos escritos o búsquedas en Internet sobre fenómenos biológicos y/o geológicos."
+        },
+        "CE 3.2": {
+          competencia: "3",
+          descripcion: "Diseñar la experimentación de fenómenos biológicos y geológicos a corto plazo de modo que permitan responder a preguntas concretas y contrastar hipótesis planteadas."
+        },
+        "CE 3.3": {
+          competencia: "3",
+          descripcion: "Realizar toma de datos cuantitativos o cualitativos en experimentos ya planteados sobre fenómenos biológicos y geológicos utilizando los instrumentos, herramientas, métodos y técnicas adecuadas, incluidas las digitales."
+        },
+        "CE 3.4": {
+          competencia: "3",
+          descripcion: "Interpretar los resultados obtenidos en el proyecto de investigación utilizando herramientas matemáticas y tecnológicas sencillas."
+        },
+        "CE 3.5": {
+          competencia: "3",
+          descripcion: "Cooperar dentro de un proyecto científico grupal desempeñando una función concreta, demostrando respeto hacia la diversidad, la igualdad de género, equidad y empatía, y favoreciendo la inclusión."
+        },
+        "CE 3.6": {
+          competencia: "3",
+          descripcion: "Presentar la información y observación de campo utilizando el formato de textos, tablas, pequeños informes y herramientas digitales."
+        },
+        "CE 3.7": {
+          competencia: "3",
+          descripcion: "Conocer las normas de seguridad necesarias valorando su aplicación a la hora de realizar un trabajo científico de campo o de laboratorio."
+        },
+        "CE 4.1": {
+          competencia: "4",
+          descripcion: "Dar explicación a procesos biológicos o geológicos utilizando conocimientos, datos e información aportados por el profesorado, el razonamiento lógico, el pensamiento computacional o recursos digitales, gestionando y utilizando, en este último caso, un entorno personal digital de aprendizaje."
+        },
+        "CE 5.1": {
+          competencia: "5",
+          descripcion: "Relacionar, con fundamentos científicos de las ciencias biológicas y de la Tierra, la preservación de la biodiversidad, la conservación del medio ambiente, la protección de los seres vivos del entorno, el desarrollo sostenible y la calidad de vida."
+        },
+        "CE 6.1": {
+          competencia: "6",
+          descripcion: "Valorar la importancia de los ecosistemas y el paisaje como patrimonio natural analizando la fragilidad de los elementos que lo componen y reconociendo el entorno como parte esencial para el mantenimiento de la vida, así como elemento cultural, desarrollando una actitud sostenible que promueva su conservación."
+        },
+        "CE 6.2": {
+          competencia: "6",
+          descripcion: "Reflexionar sobre los riesgos naturales e impactos ambientales que determinados sucesos naturales y acciones humanas puedan suponer sobre el medio ambiente, determinando las repercusiones que ocasionan."
+        }
+      };
+
+      // ---- 1. Tabla de CE (sección 1) ----
+      function initTablaCE() {
+        const tbody = document.querySelector('#tablaCE tbody');
+        tbody.innerHTML = '';
+
+        listaCE.forEach(ce => {
+          const tr = document.createElement('tr');
+          tr.dataset.ceCode = ce;
+          const meta = CE_DETALLE[ce];
+          if (meta) tr.dataset.competencia = meta.competencia;
+
+          const tdUse = document.createElement('td');
+          const chk = document.createElement('input');
+          chk.type = 'checkbox';
+          chk.className = 'ce-uso';
+          chk.dataset.ce = ce;
+          tdUse.appendChild(chk);
+
+          const tdCE = document.createElement('td');
+          const divCodigo = document.createElement('div');
+          divCodigo.className = 'ce-codigo';
+          divCodigo.textContent = ce + (meta ? ' (Comp. esp. ' + meta.competencia + ')' : '');
+          tdCE.appendChild(divCodigo);
+          if (meta && meta.descripcion) {
+            const divDesc = document.createElement('div');
+            divDesc.className = 'ce-descripcion';
+            divDesc.textContent = meta.descripcion;
+            tdCE.appendChild(divDesc);
+          }
+
+          const tdPeso = document.createElement('td');
+          const inpPeso = document.createElement('input');
+          inpPeso.type = 'number';
+          inpPeso.min = '0';
+          inpPeso.max = '100';
+          inpPeso.step = '0.5';
+          inpPeso.className = 'ce-peso-curso';
+          inpPeso.dataset.ce = ce;
+          tdPeso.appendChild(inpPeso);
+
+          tr.appendChild(tdUse);
+          tr.appendChild(tdCE);
+          tr.appendChild(tdPeso);
+          tbody.appendChild(tr);
+        });
+      }
+
+      function aplicarFiltroCompetencia(valor) {
+        const filas = document.querySelectorAll('#tablaCE tbody tr');
+        filas.forEach(tr => {
+          const comp = tr.dataset.competencia;
+          if (valor === 'todas' || !comp || comp === valor) {
+            tr.style.display = '';
+          } else {
+            tr.style.display = 'none';
+          }
+        });
+      }
+
+      function getCESeleccionados() {
+        const rows = document.querySelectorAll('#tablaCE tbody tr');
+        const seleccionados = [];
+        rows.forEach(row => {
+          const chk = row.querySelector('.ce-uso');
+          if (chk && chk.checked) {
+            seleccionados.push({
+              codigo: row.dataset.ceCode
+            });
+          }
+        });
+        return seleccionados;
+      }
+
+      function getCEActivos() {
+        const rows = document.querySelectorAll('#tablaCE tbody tr');
+        const activos = [];
+        rows.forEach(row => {
+          const ce = row.dataset.ceCode;
+          const chk = row.querySelector('.ce-uso');
+          const inpPeso = row.querySelector('.ce-peso-curso');
+          if (!chk || !inpPeso) return;
+          if (!chk.checked) return;
+          let pesoPct = parseFloat(inpPeso.value);
+          if (isNaN(pesoPct) || pesoPct <= 0) return;
+          activos.push({
+            codigo: ce,
+            pesoPct: pesoPct,
+            pesoDec: pesoPct / 100
+          });
+        });
+        return activos;
+      }
+
+      // ---- 2. Instrumentos de evaluación (sección 2) ----
+      let instrumentos = [
+        { idx: 0, nombre: 'Cuaderno' },
+        { idx: 1, nombre: 'Proyecto' },
+        { idx: 2, nombre: 'Pruebas' },
+        { idx: 3, nombre: 'Guía Obs.' }
+      ];
+
+      function renderTablaInstrumentos() {
+        const tbody = document.querySelector('#tablaInstrumentos tbody');
+        tbody.innerHTML = '';
+        instrumentos.forEach((inst, i) => {
+          const tr = document.createElement('tr');
+
+          const tdIdx = document.createElement('td');
+          tdIdx.textContent = i + 1;
+
+          const tdNombre = document.createElement('td');
+          const inp = document.createElement('input');
+          inp.type = 'text';
+          inp.value = inst.nombre;
+          inp.className = 'nombre-instrumento';
+          inp.dataset.idx = inst.idx;
+          inp.placeholder = 'Ej. Pruebas, Cuaderno…';
+          tdNombre.appendChild(inp);
+
+          tr.appendChild(tdIdx);
+          tr.appendChild(tdNombre);
+          tbody.appendChild(tr);
+        });
+      }
+
+      function leerInstrumentosActivos() {
+        document.querySelectorAll('.nombre-instrumento').forEach(inp => {
+          const idx = parseInt(inp.dataset.idx, 10);
+          if (!isNaN(idx) && instrumentos[idx]) {
+            instrumentos[idx].nombre = inp.value.trim();
+          }
+        });
+        return instrumentos
+          .filter(inst => inst.nombre && inst.nombre.length > 0)
+          .map(inst => ({ idx: inst.idx, nombre: inst.nombre }));
+      }
+
+      document.getElementById('btnAddInstrumento').addEventListener('click', () => {
+        const nuevoIdx = instrumentos.length;
+        instrumentos.push({
+          idx: nuevoIdx,
+          nombre: 'Instrumento ' + (nuevoIdx + 1)
+        });
+        renderTablaInstrumentos();
+      });
+
+      // ---- 3. Matriz CE – instrumentos (sección 3) ----
+      function actualizarTotalFila(tr) {
+        const inputs = tr.querySelectorAll('input.mat-ce-inst');
+        let suma = 0;
+        inputs.forEach(inp => {
+          const v = parseFloat(inp.value);
+          if (!isNaN(v)) suma += v;
+        });
+        const tdTotal = tr.querySelector('.mat-total-fila');
+        if (!tdTotal) return;
+        if (suma === 0) {
+          tdTotal.textContent = '';
+          tdTotal.classList.remove('mat-total-ok', 'mat-total-warn');
+        } else {
+          let texto = suma.toFixed(1);
+          texto = texto.replace(/\.0$/, '');
+          tdTotal.textContent = texto + ' %';
+          tdTotal.classList.remove('mat-total-ok', 'mat-total-warn');
+          if (Math.abs(suma - 100) < 0.5) {
+            tdTotal.classList.add('mat-total-ok');
+          } else {
+            tdTotal.classList.add('mat-total-warn');
+          }
+        }
+      }
+
+      function buildMatrizCEInstr() {
+        const ceSel = getCESeleccionados();
+        if (ceSel.length === 0) {
+          alert('Marca al menos un criterio en la sección 1.');
+          return;
+        }
+        const instActivos = leerInstrumentosActivos();
+        if (instActivos.length === 0) {
+          alert('Define al menos un instrumento con nombre en la sección 2.');
+          return;
+        }
+
+        const table = document.getElementById('tablaMatrizCEInstr');
+        const theadRow = table.querySelector('thead tr');
+        const tbody = table.querySelector('tbody');
+        theadRow.innerHTML = '';
+        tbody.innerHTML = '';
+
+        const thCE = document.createElement('th');
+        thCE.textContent = 'CE';
+        theadRow.appendChild(thCE);
+
+        instActivos.forEach(inst => {
+          const th = document.createElement('th');
+          th.textContent = inst.nombre;
+          theadRow.appendChild(th);
+        });
+
+        const thTotal = document.createElement('th');
+        thTotal.textContent = 'TOTAL fila (%)';
+        theadRow.appendChild(thTotal);
+
+        ceSel.forEach(ceObj => {
+          const tr = document.createElement('tr');
+          tr.dataset.ce = ceObj.codigo;
+
+          const tdCE = document.createElement('td');
+          tdCE.textContent = ceObj.codigo;
+          tr.appendChild(tdCE);
+
+          instActivos.forEach(inst => {
+            const td = document.createElement('td');
+            const inp = document.createElement('input');
+            inp.type = 'number';
+            inp.min = '0';
+            inp.max = '100';
+            inp.step = '0.5';
+            inp.className = 'mat-ce-inst';
+            inp.dataset.ce = ceObj.codigo;
+            inp.dataset.instIdx = inst.idx;
+            inp.addEventListener('input', () => actualizarTotalFila(tr));
+            td.appendChild(inp);
+            tr.appendChild(td);
+          });
+
+          const tdTotal = document.createElement('td');
+          tdTotal.className = 'mat-total-fila';
+          tdTotal.textContent = '';
+          tr.appendChild(tdTotal);
+
+          tbody.appendChild(tr);
+          actualizarTotalFila(tr);
+        });
+      }
+
+      document.getElementById('btnGenerarMatrizCEInstr').addEventListener('click', buildMatrizCEInstr);
+
+      // ---- CE permitidos por instrumento según tabla 3 ----
+      function getCEPermitidosPorInstrumento(nombreInst) {
+        if (!nombreInst) return [];
+        const instActivos = leerInstrumentosActivos();
+        const inst = instActivos.find(i => i.nombre === nombreInst);
+        if (!inst) return [];
+        const inputs = document.querySelectorAll(
+          'input.mat-ce-inst[data-inst-idx="' + inst.idx + '"]'
+        );
+        const ces = [];
+        inputs.forEach(inp => {
+          const val = parseFloat(inp.value);
+          if (!isNaN(val) && val > 0) {
+            const ce = inp.dataset.ce;
+            if (ce && ces.indexOf(ce) === -1) ces.push(ce);
+          }
+        });
+        return ces;
+      }
+
+      // ---- 4. Actividades (sección 4) ----
+      function addLineaCEActividad(container, nombreInst) {
+        const permitidos = getCEPermitidosPorInstrumento(nombreInst);
+        if (permitidos.length === 0) {
+          alert('Para esta actividad aún no hay CE asignados a ese instrumento.\nRevisa la tabla CE–instrumentos (sección 3).');
+          return;
+        }
+
+        const line = document.createElement('div');
+        line.className = 'act-ce-line';
+
+        const sel = document.createElement('select');
+        sel.className = 'act-ce-select';
+        const opt0 = new Option('Selecciona CE...', '');
+        sel.appendChild(opt0);
+        permitidos.forEach(ce => {
+          sel.appendChild(new Option(ce, ce));
+        });
+
+        const inpPeso = document.createElement('input');
+        inpPeso.type = 'number';
+        inpPeso.min = '0';
+        inpPeso.max = '100';
+        inpPeso.step = '0.5';
+        inpPeso.placeholder = '% CE';
+        inpPeso.className = 'act-ce-peso';
+
+        const btnDel = document.createElement('button');
+        btnDel.type = 'button';
+        btnDel.textContent = 'x';
+        btnDel.className = 'btn-mini';
+        btnDel.addEventListener('click', () => {
+          container.removeChild(line);
+        });
+
+        line.appendChild(sel);
+        line.appendChild(inpPeso);
+        line.appendChild(btnDel);
+        container.appendChild(line);
+      }
+
+      function actualizarCEsActividadParaFila(tr) {
+        const selInstr = tr.querySelector('.act-instrumento');
+        const cont = tr.querySelector('.act-ce-container');
+        if (!selInstr || !cont) return;
+        const nombreInst = selInstr.value;
+        const permitidos = getCEPermitidosPorInstrumento(nombreInst);
+
+        cont.querySelectorAll('.act-ce-line').forEach(line => {
+          const sel = line.querySelector('.act-ce-select');
+          const valorPrevio = sel.value;
+          sel.innerHTML = '';
+          const opt0 = new Option('Selecciona CE...', '');
+          sel.appendChild(opt0);
+          permitidos.forEach(ce => sel.appendChild(new Option(ce, ce)));
+          if (permitidos.indexOf(valorPrevio) !== -1) {
+            sel.value = valorPrevio;
+          }
+        });
+      }
+
+      function addActividadFila() {
+        const tbody = document.getElementById('tbodyActividades');
+        const filaCount = tbody.querySelectorAll('tr').length;
+        const idx = filaCount + 1;
+
+        const tr = document.createElement('tr');
+
+        const tdIdx = document.createElement('td');
+        tdIdx.textContent = idx;
+
+        const tdCod = document.createElement('td');
+        const inpCod = document.createElement('input');
+        inpCod.type = 'text';
+        inpCod.className = 'act-codigo';
+        inpCod.placeholder = 'Ej. ACT' + idx;
+        tdCod.appendChild(inpCod);
+
+        const tdNom = document.createElement('td');
+        const inpNom = document.createElement('input');
+        inpNom.type = 'text';
+        inpNom.className = 'act-nombre';
+        inpNom.placeholder = 'Ej. Examen UD1';
+        tdNom.appendChild(inpNom);
+
+        const tdInstr = document.createElement('td');
+        const selectInstr = document.createElement('select');
+        selectInstr.className = 'act-instrumento';
+        const opt0 = new Option('Selecciona instrumento…', '');
+        selectInstr.appendChild(opt0);
+        const instActivos = leerInstrumentosActivos();
+        instActivos.forEach(inst => {
+          selectInstr.appendChild(new Option(inst.nombre, inst.nombre));
+        });
+        tdInstr.appendChild(selectInstr);
+
+        const tdPeso = document.createElement('td');
+        const inpPeso = document.createElement('input');
+        inpPeso.type = 'number';
+        inpPeso.min = '0';
+        inpPeso.max = '100';
+        inpPeso.step = '0.5';
+        inpPeso.placeholder = 'Ej. 20';
+        inpPeso.className = 'act-peso';
+        tdPeso.appendChild(inpPeso);
+
+        const tdCE = document.createElement('td');
+        tdCE.className = 'td-act-ce';
+        const contCE = document.createElement('div');
+        contCE.className = 'act-ce-container';
+        const btnAddCE = document.createElement('button');
+        btnAddCE.type = 'button';
+        btnAddCE.className = 'btn-mini';
+        btnAddCE.textContent = '+ CE';
+        btnAddCE.addEventListener('click', () => {
+          const nombreInstSel = selectInstr.value;
+          if (!nombreInstSel) {
+            alert('Primero selecciona el instrumento de la actividad.');
+            return;
+          }
+          addLineaCEActividad(contCE, nombreInstSel);
+        });
+        tdCE.appendChild(contCE);
+        tdCE.appendChild(btnAddCE);
+
+        tr.appendChild(tdIdx);
+        tr.appendChild(tdCod);
+        tr.appendChild(tdNom);
+        tr.appendChild(tdInstr);
+        tr.appendChild(tdPeso);
+        tr.appendChild(tdCE);
+
+        selectInstr.addEventListener('change', () => {
+          actualizarCEsActividadParaFila(tr);
+        });
+
+        tbody.appendChild(tr);
+      }
+
+      function delUltimaActividad() {
+        const tbody = document.getElementById('tbodyActividades');
+        const filas = tbody.querySelectorAll('tr');
+        if (filas.length > 0) {
+          tbody.removeChild(filas[filas.length - 1]);
+        }
+      }
+
+      function actualizarInstrumentosEnActividades() {
+        const instActivos = leerInstrumentosActivos();
+        const selects = document.querySelectorAll('select.act-instrumento');
+        selects.forEach(sel => {
+          const valorPrevio = sel.value;
+          sel.innerHTML = '';
+          const opt0 = new Option('Selecciona instrumento…', '');
+          sel.appendChild(opt0);
+          instActivos.forEach(inst => {
+            sel.appendChild(new Option(inst.nombre, inst.nombre));
+          });
+          if (valorPrevio && instActivos.some(i => i.nombre === valorPrevio)) {
+            sel.value = valorPrevio;
+          }
+          const tr = sel.closest('tr');
+          if (tr) actualizarCEsActividadParaFila(tr);
+        });
+      }
+
+      document.getElementById('btnAddActividad').addEventListener('click', addActividadFila);
+      document.getElementById('btnDelActividad').addEventListener('click', delUltimaActividad);
+      document.getElementById('btnActualizarInstrActividades').addEventListener('click', actualizarInstrumentosEnActividades);
+
+      function getActividades() {
+        const tbody = document.getElementById('tbodyActividades');
+        const filas = tbody.querySelectorAll('tr');
+        const actividades = [];
+        filas.forEach(tr => {
+          const inpCod = tr.querySelector('.act-codigo');
+          const inpNom = tr.querySelector('.act-nombre');
+          const selInstr = tr.querySelector('.act-instrumento');
+          const inpPeso = tr.querySelector('.act-peso');
+
+          const cod = (inpCod && inpCod.value || '').trim();
+          const nom = (inpNom && inpNom.value || '').trim();
+          const instr = (selInstr && selInstr.value || '').trim();
+          let pesoPct = parseFloat(inpPeso && inpPeso.value);
+
+          if (!instr || isNaN(pesoPct) || pesoPct <= 0) return;
+          if (!cod && !nom) return;
+
+          const ceContainer = tr.querySelector('.act-ce-container');
+          const ceLines = ceContainer ? ceContainer.querySelectorAll('.act-ce-line') : [];
+          const ces = [];
+          ceLines.forEach(line => {
+            const sel = line.querySelector('.act-ce-select');
+            const inp = line.querySelector('.act-ce-peso');
+            const ceCod = (sel && sel.value || '').trim();
+            if (!ceCod) return;
+            let cePeso = parseFloat(inp && inp.value);
+            if (isNaN(cePeso)) cePeso = null;
+            ces.push({ ce: ceCod, pesoPct: cePeso });
+          });
+
+          actividades.push({
+            codigo: cod || nom,
+            nombre: nom,
+            instrumento: instr,
+            pesoPct: pesoPct,
+            pesoDec: pesoPct / 100,
+            ces: ces
+          });
+        });
+        return actividades;
+      }
+
+      // Normalizar % CE dentro de cada actividad (cuando se han elegido CE pero no se han puesto %)
+      function normalizarPesosCEActividades(actividades) {
+        actividades.forEach(act => {
+          if (!act.ces || act.ces.length === 0) return;
+          let totalDefinido = 0;
+          let nConValor = 0;
+          act.ces.forEach(c => {
+            if (c.pesoPct != null && !isNaN(c.pesoPct) && c.pesoPct > 0) {
+              totalDefinido += c.pesoPct;
+              nConValor++;
+            }
+          });
+          if (nConValor === 0) {
+            const reparto = 100 / act.ces.length;
+            act.ces.forEach(c => c.pesoPct = reparto);
+          }
+        });
+      }
+
+      // ---- 5. Matrices internas de pesos CE–actividad ----
+      function getDistribucionCEInst(instActivos) {
+        const dist = {};
+        instActivos.forEach(inst => {
+          const inputs = document.querySelectorAll(
+            'input.mat-ce-inst[data-inst-idx="' + inst.idx + '"]'
+          );
+          inputs.forEach(inp => {
+            const ce = inp.dataset.ce;
+            let v = parseFloat(inp.value);
+            if (isNaN(v) || v <= 0) return;
+            if (!dist[ce]) dist[ce] = {};
+            dist[ce][inst.idx] = v / 100; // a decimal
+          });
+        });
+        return dist;
+      }
+
+      function construirMatricesCEAct(ceActivos, actividades, instActivos) {
+        const dist = getDistribucionCEInst(instActivos);
+        const idxPorNombre = {};
+        instActivos.forEach(inst => {
+          idxPorNombre[inst.nombre] = inst.idx;
+        });
+
+        const nCE = ceActivos.length;
+        const pesos = [];
+        const factores = [];
+
+        for (let i = 0; i < nCE; i++) {
+          const ceCode = ceActivos[i].codigo;
+          const filaPesos = [];
+          const filaFactores = [];
+          for (let j = 0; j < MAX_ACT; j++) {
+            const act = actividades[j];
+            let peso = 0;
+            let factor = 0;
+            if (act) {
+              const instName = act.instrumento;
+              const instIdx = idxPorNombre[instName];
+              const distCEInst = dist[ceCode] && dist[ceCode][instIdx] || 0;
+              const pesoActDec = act.pesoDec || 0;
+              if (distCEInst > 0 && pesoActDec > 0) {
+                if (!act.ces || act.ces.length === 0) {
+                  factor = 1;
+                } else {
+                  const info = act.ces.find(c => c.ce === ceCode);
+                  if (info && info.pesoPct != null && !isNaN(info.pesoPct) && info.pesoPct > 0) {
+                    factor = info.pesoPct / 100;
+                  } else {
+                    factor = 0;
+                  }
+                }
+                peso = pesoActDec * distCEInst * factor;
+              }
+            }
+            filaPesos.push(peso);
+            filaFactores.push(factor);
+          }
+          pesos.push(filaPesos);
+          factores.push(filaFactores);
+        }
+
+        return { pesos: pesos, factores: factores };
+      }
+
+      function formatNumberForFormula(num) {
+        if (!isFinite(num) || Math.abs(num) < 1e-12) return '0';
+        let s = num.toFixed(6);
+        s = s.replace(/0+$/, '').replace(/\.$/, '');
+        if (!s) s = '0';
+        return s;
+      }
+
+      // ---- 6. Creación de hojas Excel ----
+
+      // 6.1 CONFIG_CE_CURSO
+      function crearHojaConfigCE(ceActivos) {
+        const datos = [];
+        datos.push([
+          'INSTRUCCIONES',
+          '1) Estos pesos vienen del generador web (sección 1). Puedes ajustarlos.\n' +
+          '2) La suma de la columna "Peso % en el curso" debería ser 100.\n' +
+          '3) No borres las fórmulas de la fila TOTAL.'
+        ]);
+        datos.push([]);
+        datos.push(['CE', 'Peso % en el curso', 'Peso decimal']);
+
+        const filaPrimeraCE = 4;
+        ceActivos.forEach(ce => {
+          datos.push([ce.codigo, ce.pesoPct, ce.pesoDec]);
+        });
+
+        const ws = XLSXUtils.aoa_to_sheet(datos);
+
+        const nCE = ceActivos.length;
+        if (nCE > 0) {
+          const filaUltimaCE = filaPrimeraCE + nCE - 1;
+          const filaTotal = filaUltimaCE + 1;
+          ws['A' + filaTotal] = { t: 's', v: 'TOTAL' };
+          ws['B' + filaTotal] = {
+            t: 'n',
+            f: 'SUM(B' + filaPrimeraCE + ':B' + filaUltimaCE + ')'
+          };
+          ws['C' + filaTotal] = {
+            t: 'n',
+            f: 'SUM(C' + filaPrimeraCE + ':C' + filaUltimaCE + ')'
+          };
+        }
+
+        ws['!cols'] = [
+          { wch: 10 },
+          { wch: 20 },
+          { wch: 15 }
+        ];
+        return ws;
+      }
+
+      // 6.2 MATRIZ_CE_INSTR
+      function crearHojaMatriz(ceActivos, instActivos) {
+        const datos = [];
+        datos.push([
+          'INSTRUCCIONES',
+          'Para cada criterio reparte el 100% entre los instrumentos que realmente usas para ese criterio.\n' +
+          'Los valores vienen del formulario web (sección 3), pero puedes ajustarlos aquí si lo necesitas.'
+        ]);
+        datos.push([]);
+
+        const header = ['CE'];
+        instActivos.forEach(inst => header.push(inst.nombre));
+        header.push('TOTAL fila (%)');
+        datos.push(header);
+
+        const filaPrimeraCE = 4;
+        ceActivos.forEach(ce => {
+          const row = [ce.codigo];
+          instActivos.forEach(inst => {
+            const inp = document.querySelector(
+              'input.mat-ce-inst[data-ce="' + ce.codigo + '"][data-inst-idx="' + inst.idx + '"]'
+            );
+            let val = parseFloat(inp && inp.value);
+            if (isNaN(val)) val = 0;
+            row.push(val);
+          });
+          row.push(null);
+          datos.push(row);
+        });
+
+        const ws = XLSXUtils.aoa_to_sheet(datos);
+
+        const nCE = ceActivos.length;
+        const nInst = instActivos.length;
+        if (nCE > 0 && nInst > 0) {
+          const filaUltimaCE = filaPrimeraCE + nCE - 1;
+          const colInstEndIndex = nInst;
+          const lastInstColLetter = XLSXUtils.encode_col(colInstEndIndex);
+          const colTotalIndex = colInstEndIndex + 1;
+          const colTotalLetter = XLSXUtils.encode_col(colTotalIndex);
+
+          for (let i = 0; i < nCE; i++) {
+            const fila = filaPrimeraCE + i;
+            ws[colTotalLetter + fila] = {
+              t: 'n',
+              f: 'SUM(B' + fila + ':' + lastInstColLetter + fila + ')'
+            };
+          }
+        }
+
+        const cols = [{ wch: 10 }];
+        instActivos.forEach(() => cols.push({ wch: 14 }));
+        cols.push({ wch: 16 });
+        ws['!cols'] = cols;
+        return ws;
+      }
+
+      // 6.3 ACTIVIDADES
+      function crearHojaActividades(actividades) {
+        const datos = [];
+        datos.push([
+          'INSTRUCCIONES',
+          '1) Aquí puedes cambiar, añadir o quitar actividades sin volver al generador web.\n' +
+          '2) Usa las filas vacías para nuevas actividades (no insertes filas nuevas).\n' +
+          '3) Rellena: Código, Nombre, Instrumento y % dentro del instrumento.'
+        ]);
+        datos.push([]);
+        datos.push(['Código act.', 'Nombre actividad', 'Instrumento', '% dentro del instrumento']);
+
+        for (let i = 0; i < MAX_ACT; i++) {
+          const act = actividades[i];
+          datos.push([
+            act ? act.codigo : '',
+            act ? act.nombre : '',
+            act ? act.instrumento : '',
+            act ? act.pesoPct : ''
+          ]);
+        }
+
+        const ws = XLSXUtils.aoa_to_sheet(datos);
+        ws['!cols'] = [
+          { wch: 12 },
+          { wch: 30 },
+          { wch: 16 },
+          { wch: 20 }
+        ];
+        return ws;
+      }
+
+      // 6.4 NOTAS_ALUMNOS (nota por CE y NOTA GLOBAL ACUMULATIVA)
+      function crearHojaNotasAlumnos(ceActivos, pesosCEAct) {
+        const nCE = ceActivos.length;
+        const nAct = MAX_ACT;
+
+        const datos = [];
+        datos.push([
+          'INSTRUCCIONES',
+          '1) Escribe los nombres del alumnado en la columna A.\n' +
+          '2) Rellena las notas de cada actividad (0–10). Las actividades sin nota NO se tienen en cuenta.\n' +
+          '3) La nota por criterio y la nota global se calculan solas. No borres fórmulas.\n' +
+          '4) La nota global es ACUMULATIVA: solo pondera los Criterios que ya tienen nota, reescalando los pesos.'
+        ]);
+        datos.push([]);
+
+        const header = ['Alumno'];
+        for (let j = 0; j < nAct; j++) header.push('');
+        for (let i = 0; i < nCE; i++) header.push('');
+        header.push('Nota global curso (0–10)');
+        datos.push(header);
+
+        for (let i = 0; i < MAX_ALUMNOS; i++) {
+          const row = new Array(1 + nAct + nCE + 1).fill('');
+          datos.push(row);
+        }
+
+        const ws = XLSXUtils.aoa_to_sheet(datos);
+
+        const filaHeader = 3;
+        const filaPrimeraAlumno = 4;
+        const filaPrimeraActividad = 4;
+
+        const firstActColIndex = 1;               // B
+        const lastActColIndex = firstActColIndex + nAct - 1;
+        const firstCEColIndex = lastActColIndex + 1;
+        const lastCEColIndex = firstCEColIndex + nCE - 1;
+        const colNotaGlobalIndex = lastCEColIndex + 1;
+
+        const firstActColLetter = XLSXUtils.encode_col(firstActColIndex);
+        const lastActColLetter = XLSXUtils.encode_col(lastActColIndex);
+        const firstCEColLetter = XLSXUtils.encode_col(firstCEColIndex);
+        const lastCEColLetter = XLSXUtils.encode_col(lastCEColIndex);
+        const colNotaGlobalLetter = XLSXUtils.encode_col(colNotaGlobalIndex);
+
+        // Encabezados de actividades
+        for (let j = 0; j < nAct; j++) {
+          const colIndex = firstActColIndex + j;
+          const colLetter = XLSXUtils.encode_col(colIndex);
+          const filaAct = filaPrimeraActividad + j;
+          ws[colLetter + filaHeader] = {
+            t: 's',
+            f: 'IF(ACTIVIDADES!A' + filaAct + '<>"",ACTIVIDADES!A' + filaAct + ',ACTIVIDADES!B' + filaAct + ')'
+          };
+        }
+
+        // Encabezados de CE
+        for (let i = 0; i < nCE; i++) {
+          const colIndex = firstCEColIndex + i;
+          const colLetter = XLSXUtils.encode_col(colIndex);
+          ws[colLetter + filaHeader] = {
+            t: 's',
+            v: 'Nota ' + ceActivos[i].codigo
+          };
+        }
+        ws[colNotaGlobalLetter + filaHeader] = {
+          t: 's',
+          v: 'Nota global curso (0–10)'
+        };
+
+        // Pesos de CE en CONFIG_CE_CURSO (decimales)
+        const filaPrimeraCE_Config = 4;
+        const filaUltimaCE_Config = filaPrimeraCE_Config + nCE - 1;
+        const ceWeightRange =
+          'CONFIG_CE_CURSO!$C$' + filaPrimeraCE_Config + ':$C$' + filaUltimaCE_Config;
+        const ceWeightFirstCell = 'CONFIG_CE_CURSO!$C$' + filaPrimeraCE_Config;
+
+        // Fórmulas por alumno
+        for (let iAlumno = 0; iAlumno < MAX_ALUMNOS; iAlumno++) {
+          const fila = filaPrimeraAlumno + iAlumno;
+
+          const gradeRange =
+            'NOTAS_ALUMNOS!$' + firstActColLetter + '$' + fila +
+            ':$' + lastActColLetter + '$' + fila;
+
+          // Nota por CE (media ponderada de actividades que tienen nota)
+          for (let iCE = 0; iCE < nCE; iCE++) {
+            const filaPesos = pesosCEAct[iCE];
+            const arr = [];
+            for (let j = 0; j < nAct; j++) {
+              arr.push(formatNumberForFormula(filaPesos[j]));
+            }
+            const weightsArray = '{' + arr.join(',') + '}';
+
+            const colIndexCE = firstCEColIndex + iCE;
+            const colLetterCE = XLSXUtils.encode_col(colIndexCE);
+            const addr = colLetterCE + fila;
+
+            const formulaCE =
+              'IFERROR(' +
+                'SUMPRODUCT(' + gradeRange + ',' + weightsArray + ',--(' + gradeRange + '<>""))' +
+                '/SUMPRODUCT(' + weightsArray + ',--(' + gradeRange + '<>""))' +
+              ',"")';
+
+            ws[addr] = { t: 'n', f: formulaCE };
+          }
+
+          // Nota global ACUMULATIVA por CE
+          if (nCE > 0) {
+            const ceScoreRowRange =
+              'NOTAS_ALUMNOS!$' + firstCEColLetter + '$' + fila +
+              ':$' + lastCEColLetter + '$' + fila;
+
+            const indexVector =
+              'INDEX(' + ceScoreRowRange +
+              ',ROW(' + ceWeightRange + ')-ROW(' + ceWeightFirstCell + ')+1)';
+
+            const indicatorVector = indexVector + '<>""';
+
+            const numerator =
+              'SUMPRODUCT(' + ceWeightRange + ',--(' + indexVector + '))';
+
+            const denominator =
+              'SUMPRODUCT(' + ceWeightRange + ',--(' + indicatorVector + '))';
+
+            const addrGlobal = colNotaGlobalLetter + fila;
+            const formulaGlobal =
+              'IFERROR(' +
+                'IF(COUNT(' + ceScoreRowRange + ')=0,"",' +
+                  numerator + '/' + denominator +
+                ')' +
+              ',"")';
+
+            ws[addrGlobal] = { t: 'n', f: formulaGlobal };
+          }
+        }
+
+        const cols = [];
+        cols.push({ wch: 22 }); // Alumno
+        for (let j = 0; j < nAct; j++) cols.push({ wch: 12 });
+        for (let i = 0; i < nCE; i++) cols.push({ wch: 14 });
+        cols.push({ wch: 18 });
+        ws['!cols'] = cols;
+
+        return ws;
+      }
+
+      // 6.5 NOTAS_POR_CRITERIO (nota CE + APORTE CE + nota global, versión buena)
+      function crearHojaNotasPorCriterio(ceActivos) {
+        const nCE = ceActivos.length;
+        const nAct = MAX_ACT;
+
+        const datos = [];
+        // Fila 1: instrucciones
+        datos.push([
+          'INSTRUCCIONES',
+          'Hoja resumen centrada en los criterios.\n' +
+          '• Lee la nota de cada CE desde NOTAS_ALUMNOS.\n' +
+          '• Calcula el APORTE ponderado de cada criterio a la nota del curso.\n' +
+          '• La suma de los aportes coincide con la nota global acumulativa.'
+        ]);
+        // Fila 2: pesos (se rellenan con fórmulas)
+        datos.push(['Pesos CE (decimales, no tocar)']);
+        // Fila 3: cabecera
+        const header = ['Alumno'];
+        ceActivos.forEach(ce => header.push('Nota ' + ce.codigo));
+        ceActivos.forEach(ce => header.push('Aporte ' + ce.codigo));
+        header.push('Nota global curso (0–10)');
+        datos.push(header);
+
+        // Filas de alumnos
+        for (let i = 0; i < MAX_ALUMNOS; i++) {
+          const row = new Array(1 + nCE + nCE + 1).fill('');
+          datos.push(row);
+        }
+
+        const ws = XLSXUtils.aoa_to_sheet(datos);
+
+        // Índices de columnas
+        const firstNotaCEColIndex = 1; // B
+        const lastNotaCEColIndex = firstNotaCEColIndex + nCE - 1;
+        const firstAporteColIndex = lastNotaCEColIndex + 1;
+        const lastAporteColIndex = firstAporteColIndex + nCE - 1;
+        const colNotaGlobalIndex = lastAporteColIndex + 1;
+
+        const firstNotaCEColLetter = XLSXUtils.encode_col(firstNotaCEColIndex);
+        const lastNotaCEColLetter = XLSXUtils.encode_col(lastNotaCEColIndex);
+        const colNotaGlobalLetter = XLSXUtils.encode_col(colNotaGlobalIndex);
+
+        // Fila de pesos (fila 2) copiando de CONFIG_CE_CURSO!C4:C...
+        const filaPesos = 2;
+        const filaPrimeraCE_Config = 4;
+        for (let iCE = 0; iCE < nCE; iCE++) {
+          const colIndex = firstNotaCEColIndex + iCE;
+          const colLetter = XLSXUtils.encode_col(colIndex);
+          const filaConfig = filaPrimeraCE_Config + iCE;
+          ws[colLetter + filaPesos] = {
+            t: 'n',
+            f: 'CONFIG_CE_CURSO!$C$' + filaConfig
+          };
+        }
+
+        // Rango horizontal de pesos en esta hoja (fila 2)
+        const pesosRowRange =
+          '$' + firstNotaCEColLetter + '$' + filaPesos +
+          ':$' + lastNotaCEColLetter + '$' + filaPesos;
+
+        // Notas CE fuente en NOTAS_ALUMNOS
+        const firstCESrcIndex = 1 + nAct; // tras las actividades
+        const srcGlobalIndex = firstCESrcIndex + nCE;
+
+        const filaPrimeraAlumno = 4;
+
+        for (let iAlumno = 0; iAlumno < MAX_ALUMNOS; iAlumno++) {
+          const fila = filaPrimeraAlumno + iAlumno;
+
+          // Nombre alumno
+          ws['A' + fila] = { t: 's', f: 'NOTAS_ALUMNOS!A' + fila };
+
+          // 1) Notas CE desde NOTAS_ALUMNOS
+          for (let iCE = 0; iCE < nCE; iCE++) {
+            const destColIndex = firstNotaCEColIndex + iCE;
+            const destColLetter = XLSXUtils.encode_col(destColIndex);
+
+            const srcColIndex = firstCESrcIndex + iCE;
+            const srcColLetter = XLSXUtils.encode_col(srcColIndex);
+
+            ws[destColLetter + fila] = {
+              t: 'n',
+              f: 'NOTAS_ALUMNOS!' + srcColLetter + fila
+            };
+          }
+
+          // Rango horizontal de notas CE en esta hoja para este alumno
+          const notasRowRange =
+            '$' + firstNotaCEColLetter + '$' + fila +
+            ':$' + lastNotaCEColLetter + '$' + fila;
+
+          // Denominador común: suma de pesos de los CE que tienen nota (no vacío)
+          const denomExpr =
+            'SUMPRODUCT(' + pesosRowRange + ',--(' + notasRowRange + '<>"" ))';
+
+          // 2) Aporte de cada CE: nota_CE * pesoCE / sumaPesosActivos
+          for (let iCE = 0; iCE < nCE; iCE++) {
+            const notaColIndex = firstNotaCEColIndex + iCE;
+            const notaColLetter = XLSXUtils.encode_col(notaColIndex);
+            const notaCellRef = notaColLetter + fila;
+
+            const pesoColIndex = firstNotaCEColIndex + iCE;
+            const pesoColLetter = XLSXUtils.encode_col(pesoColIndex);
+            const pesoCellRef = '$' + pesoColLetter + '$' + filaPesos;
+
+            const aporteColIndex = firstAporteColIndex + iCE;
+            const aporteColLetter = XLSXUtils.encode_col(aporteColIndex);
+            const aporteAddr = aporteColLetter + fila;
+
+            const formulaAporte =
+              'IF(' + notaCellRef + '="","",' +
+                notaCellRef + '*' + pesoCellRef +
+                '/(' + denomExpr + '))';
+
+            ws[aporteAddr] = { t: 'n', f: formulaAporte };
+          }
+
+          // 3) Nota global = suma de aportes
+          const firstAporteColLetter = XLSXUtils.encode_col(firstAporteColIndex);
+          const lastAporteColLetter = XLSXUtils.encode_col(lastAporteColIndex);
+          const aportesRowRange =
+            '$' + firstAporteColLetter + '$' + fila +
+            ':$' + lastAporteColLetter + '$' + fila;
+
+          ws[colNotaGlobalLetter + fila] = {
+            t: 'n',
+            f: 'IFERROR(SUM(' + aportesRowRange + '),"")'
+          };
+        }
+
+        const cols = [];
+        cols.push({ wch: 22 }); // Alumno
+        for (let i = 0; i < nCE; i++) cols.push({ wch: 14 }); // Notas CE
+        for (let i = 0; i < nCE; i++) cols.push({ wch: 16 }); // Aportes CE
+        cols.push({ wch: 20 }); // Nota global
+        ws['!cols'] = cols;
+
+        return ws;
+      }
+
+      // 6.6 FILTRO_ACT_CE (solo avanzado)
+      function crearHojaFiltroCE(ceActivos, actividades, factoresCEAct) {
+        const nCE = ceActivos.length;
+        const nAct = MAX_ACT;
+        const datos = [];
+
+        datos.push([
+          'INSTRUCCIONES',
+          'Estos factores indican cuánto de la nota de cada actividad se asigna a cada criterio (0 a 1).\n' +
+          'Se calculan al generar el Excel a partir del formulario web.'
+        ]);
+        datos.push([]);
+
+        const header = ['CE'];
+        for (let j = 0; j < nAct; j++) header.push('');
+        datos.push(header);
+
+        const ws = XLSXUtils.aoa_to_sheet(datos);
+        const filaHeader = 3;
+        const filaPrimeraActividad = 4;
+        for (let j = 0; j < nAct; j++) {
+          const colIndex = 1 + j;
+          const colLetter = XLSXUtils.encode_col(colIndex);
+          const filaAct = filaPrimeraActividad + j;
+          ws[colLetter + filaHeader] = {
+            t: 's',
+            f: 'IF(ACTIVIDADES!A' + filaAct + '<>"",ACTIVIDADES!A' + filaAct + ',ACTIVIDADES!B' + filaAct + ')'
+          };
+        }
+
+        const filaPrimeraCE = 4;
+        for (let i = 0; i < nCE; i++) {
+          const rowIdx = filaPrimeraCE + i;
+          ws['A' + rowIdx] = { t: 's', v: ceActivos[i].codigo };
+
+          for (let j = 0; j < nAct; j++) {
+            const factor = factoresCEAct[i][j];
+            if (!factor || factor <= 0) continue;
+            const colIndex = 1 + j;
+            const colLetter = XLSXUtils.encode_col(colIndex);
+            ws[colLetter + rowIdx] = { t: 'n', v: factor };
+          }
+        }
+
+        const cols = [{ wch: 10 }];
+        for (let j = 0; j < nAct; j++) cols.push({ wch: 12 });
+        ws['!cols'] = cols;
+        return ws;
+      }
+
+      // 6.7 CHECKLIST_ERRORES (solo avanzado)
+      function crearHojaChecklist(ceActivos, instActivos, actividades, pesosCEAct) {
+        const datos = [];
+        datos.push([
+          'INSTRUCCIONES',
+          'Estas comprobaciones se calculan al generar el Excel. Si cambias fórmulas a mano, revísalas de nuevo con el generador web.'
+        ]);
+        datos.push([]);
+        datos.push(['Comprobación', 'Resultado / Detalle']);
+
+        const sumaPesosCE = ceActivos.reduce((s, ce) => s + ce.pesoPct, 0);
+        let res1;
+        if (Math.abs(sumaPesosCE - 100) < 0.5) {
+          res1 = 'OK (suma ≈ 100%)';
+        } else {
+          res1 = 'REVISAR (suma = ' + sumaPesosCE.toFixed(1).replace(/\.0$/, '') + '%)';
+        }
+        datos.push(['Suma de pesos de CE en el curso', res1]);
+
+        const ceSinActs = [];
+        pesosCEAct.forEach((fila, i) => {
+          const sum = fila.reduce((s, w) => s + w, 0);
+          if (sum === 0) ceSinActs.push(ceActivos[i].codigo);
+        });
+        datos.push([
+          'CE activos sin actividades asociadas',
+          ceSinActs.length === 0 ? 'OK' : 'REVISAR (' + ceSinActs.join(', ') + ')'
+        ]);
+
+        const instSinActs = [];
+        instActivos.forEach(inst => {
+          const tiene = actividades.some(act => act.instrumento === inst.nombre);
+          if (!tiene) instSinActs.push(inst.nombre);
+        });
+        datos.push([
+          'Instrumentos definidos sin ninguna actividad',
+          instSinActs.length === 0 ? 'OK' : 'REVISAR (' + instSinActs.join(', ') + ')'
+        ]);
+
+        const ws = XLSXUtils.aoa_to_sheet(datos);
+        ws['!cols'] = [{ wch: 40 }, { wch: 70 }];
+        return ws;
+      }
+
+      // 6.8 DASHBOARD (solo avanzado)
+      function crearHojaDashboard(ceActivos, actividades, pesosCEAct) {
+        const datos = [];
+        datos.push([
+          'INSTRUCCIONES',
+          'Resumen visual de cómo se reparte la evaluación por criterios y actividades.\n' +
+          'Puedes usar estas tablas para crear gráficos rápidamente desde Excel.'
+        ]);
+        datos.push([]);
+
+        datos.push(['RESUMEN POR CRITERIO']);
+        datos.push(['CE', 'Peso % curso', 'Nº actividades que lo trabajan', 'Peso total relativo', 'Observaciones']);
+
+        const nCE = ceActivos.length;
+        for (let i = 0; i < nCE; i++) {
+          const ce = ceActivos[i];
+          const filaPesos = pesosCEAct[i];
+          const numActs = filaPesos.filter(w => w > 0).length;
+          const totalPeso = filaPesos.reduce((s, w) => s + w, 0);
+          let obs = '';
+          if (numActs === 0) obs = 'Sin actividades (no se trabaja en la práctica)';
+          else if (totalPeso < 0.1) obs = 'Cobertura baja (pocas actividades o poco peso)';
+          datos.push([
+            ce.codigo,
+            ce.pesoPct,
+            numActs,
+            totalPeso,
+            obs
+          ]);
+        }
+
+        datos.push([]);
+        datos.push(['RESUMEN DE ACTIVIDADES']);
+        datos.push(['Actividad', 'Instrumento', '% dentro del instrumento', 'CE implicados']);
+
+        const nAct = MAX_ACT;
+        for (let j = 0; j < nAct; j++) {
+          const act = actividades[j];
+          if (!act) continue;
+          const nombre = act.codigo || act.nombre;
+          const inst = act.instrumento;
+          const pctInstr = act.pesoPct;
+          const cesImp = [];
+          for (let i = 0; i < nCE; i++) {
+            if (pesosCEAct[i][j] > 0) cesImp.push(ceActivos[i].codigo);
+          }
+          datos.push([
+            nombre,
+            inst,
+            pctInstr,
+            cesImp.join(', ')
+          ]);
+        }
+
+        const ws = XLSXUtils.aoa_to_sheet(datos);
+        ws['!cols'] = [
+          { wch: 22 },
+          { wch: 18 },
+          { wch: 20 },
+          { wch: 40 },
+          { wch: 40 }
+        ];
+        return ws;
+      }
+
+      // ---- 7. Generar Excel (simple / avanzado) ----
+      function generarExcel(tipo) {
+        const ceActivos = getCEActivos();
+        if (ceActivos.length === 0) {
+          alert('Selecciona al menos un criterio de evaluación y asígnale un peso > 0 en el curso.');
+          return;
+        }
+
+        const instActivos = leerInstrumentosActivos();
+        if (instActivos.length === 0) {
+          alert('Define al menos un instrumento de evaluación con nombre.');
+          return;
+        }
+
+        const actividades = getActividades();
+        if (actividades.length === 0) {
+          alert('Añade al menos una actividad con instrumento y peso > 0.');
+          return;
+        }
+
+        const hayMatriz = document.querySelector('input.mat-ce-inst');
+        if (!hayMatriz) {
+          alert('Pulsa antes el botón "Generar / actualizar tabla CE–instrumentos" y reparte los porcentajes.');
+          return;
+        }
+
+        normalizarPesosCEActividades(actividades);
+
+        const matrices = construirMatricesCEAct(ceActivos, actividades, instActivos);
+        const pesosCEAct = matrices.pesos;
+        const factoresCEAct = matrices.factores;
+
+        const wb = XLSXUtils.book_new();
+
+        const wsConfig = crearHojaConfigCE(ceActivos);
+        XLSXUtils.book_append_sheet(wb, wsConfig, 'CONFIG_CE_CURSO');
+
+        const wsMatriz = crearHojaMatriz(ceActivos, instActivos);
+        XLSXUtils.book_append_sheet(wb, wsMatriz, 'MATRIZ_CE_INSTR');
+
+        const wsAct = crearHojaActividades(actividades);
+        XLSXUtils.book_append_sheet(wb, wsAct, 'ACTIVIDADES');
+
+        const wsNotas = crearHojaNotasAlumnos(ceActivos, pesosCEAct);
+        XLSXUtils.book_append_sheet(wb, wsNotas, 'NOTAS_ALUMNOS');
+
+        const wsNotasCE = crearHojaNotasPorCriterio(ceActivos);
+        XLSXUtils.book_append_sheet(wb, wsNotasCE, 'NOTAS_POR_CRITERIO');
+
+        if (tipo === 'avanzado') {
+          const wsFiltro = crearHojaFiltroCE(ceActivos, actividades, factoresCEAct);
+          XLSXUtils.book_append_sheet(wb, wsFiltro, 'FILTRO_ACT_CE');
+
+          const wsChecklist = crearHojaChecklist(ceActivos, instActivos, actividades, pesosCEAct);
+          XLSXUtils.book_append_sheet(wb, wsChecklist, 'CHECKLIST_ERRORES');
+
+          const wsDashboard = crearHojaDashboard(ceActivos, actividades, pesosCEAct);
+          XLSXUtils.book_append_sheet(wb, wsDashboard, 'DASHBOARD');
+        }
+
+        const nombre = tipo === 'avanzado'
+          ? 'evaluacion_criterios_avanzado.xlsx'
+          : 'evaluacion_criterios_simplificado.xlsx';
+
+        XLSX.writeFile(wb, nombre);
+      }
+
+      document.getElementById('btnExcelSimple').addEventListener('click', () => {
+        generarExcel('simple');
+      });
+      document.getElementById('btnExcelAvanzado').addEventListener('click', () => {
+        generarExcel('avanzado');
+      });
+
+      // ---- Inicialización ----
+      initTablaCE();
+      aplicarFiltroCompetencia('todas');
+      const filtroSelect = document.getElementById('filtroCompetencia');
+      if (filtroSelect) {
+        filtroSelect.addEventListener('change', () => {
+          aplicarFiltroCompetencia(filtroSelect.value);
+        });
+      }
+
+      renderTablaInstrumentos();
+      addActividadFila();
+      addActividadFila();
+      addActividadFila();
+    })();
+  </script>
+</body>
+</html>
