@@ -1,0 +1,25 @@
+{
+  "materia": "Biología y Geología",
+  "curso": "1ESO",
+  "etapa": "ESO",
+  "comunidad": "CyL",
+  "listaCE": [
+    "CE 1.1", "CE 1.2", "CE 1.3",
+    "CE 2.1", "CE 2.2", "CE 2.3", "CE 2.4",
+    "CE 3.1", "CE 3.2", "CE 3.3", "CE 3.4", "CE 3.5", "CE 3.6", "CE 3.7",
+    "CE 4.1",
+    "CE 5.1",
+    "CE 6.1", "CE 6.2"
+  ],
+  "detalleCE": {
+    "CE 1.1": {
+      "competencia": "1",
+      "descripcion": "Analizar conceptos y procesos relacionados con los contenidos de Biología y Geología interpretando y organizando la información en diferentes formatos."
+    },
+    "CE 1.2": {
+      "competencia": "1",
+      "descripcion": "Facilitar la comprensión de información relacionada con Biología y Geología transmitiéndola de forma clara..."
+    }
+    // ... y así con todos, igual que en tu CE_DETALLE actual
+  }
+}
